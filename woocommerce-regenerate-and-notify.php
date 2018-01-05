@@ -1,21 +1,19 @@
 <?php
-
 /**
+ * WooCommerce Regenerate & Notify
  *
- * @link              https://bdaley.com
- * @since             1.0.0
- * @package           Wc_Regenerate_And_Notify
+ * @package     Woo_Regenerate_And_Notify
  *
  * @wordpress-plugin
- * Plugin Name:       Woocommerce Regenerate & Notify
- * Plugin URI:        https://bdaley.com
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Plugin Name:       WooCommerce Regenerate & Notify
+ * Plugin URI:        https://github.com/bdaley/woocommerce-regenerate-and-notify
+ * Description:       A WooCommerce extension that regenerates download permissions (including expiration date) and notifies the customer.
  * Version:           1.0.0
  * Author:            Brian Daley
  * Author URI:        https://bdaley.com
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       wc-regenerate-and-notify
+ * License:           MIT
+ * License URI:       https://opensource.org/licenses/MIT
+ * Text Domain:       woo-regenerate-and-notify
  * Domain Path:       /languages
  */
 
@@ -24,42 +22,60 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Composer dependencies.
+require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 
-add_filter('woocommerce_order_actions', 'wc_regenerate_and_notify_custom_order_action');
-function wc_regenerate_and_notify_custom_order_action( $actions ) {
+/**
+ * Adds the new action to the order action meta box.
+ *
+ * @param  array $actions List of actions in the metabox.
+ * @return array $actions Amended list of actions.
+ */
+function woo_regenerate_and_notify_custom_order_action( $actions ) {
 
-	// Remove the woocommerce option to regenerate to avoid confusion
-	unset($actions['regenerate_download_permissions']);
+	// Remove the woocommerce option to regenerate to avoid confusion.
+	unset( $actions['regenerate_download_permissions'] );
 
-	// Add our new action (executed below)
-	$actions['wc_regenerate_and_notify'] = __('Regenerate permissions & send link to customer', 'wc-regenerate-and-notify');
+	// Add our new action (executed below).
+	$actions['woo_regenerate_and_notify'] = __( 'Regenerate permissions & send link to customer', 'woo-regenerate-and-notify' );
 	return $actions;
 }
 
-/**
- * We need to do 4 things:
- * 1) Reset the download counter
- * 2) Reset the download expiration date
- * 3) Send order confirmation (again) with the download links
- * 4) Add a note for recording purposes. *
- */
-add_action('woocommerce_order_action_wc_regenerate_and_notify', function($order){
+// Register the function above.
+add_filter( 'woocommerce_order_actions', 'woo_regenerate_and_notify_custom_order_action' );
 
-	// 1)  Reset the download counter
+
+
+/**
+ * Executes regenerattion, expiry reset, order note, and notification to user.
+ *
+ * @param  object $order The order WC_Order object.
+ * @return void
+ */
+function woo_regenerate_and_notify( $order ) {
+
+	// First, we reset the download counter to its original value.
 	$data_store = WC_Data_Store::load( 'customer-download' );
 	$data_store->delete_by_order_id( $order->ID );
 	wc_downloadable_product_permissions( $order->ID, true );
 
-	// 2) Retrieve Download and remove the access expiration. (Our poor customer has had enough trouble)
-	// *Could optionally reset to product default (x days or whatever)
-	$downloads = $data_store->get_downloads(array('order_id' => $order->ID) );
-	if(is_array($downloads)){
-		foreach($downloads as $download){
-			$download->set_access_expires(null);
+	// Retrieve Download(s) and completely remove the access expiration.
+	// At some point, we may want to restore the default, but we'll turn off the time limit for now.
+	$downloads = $data_store->get_downloads( array( 'order_id' => $order->ID ) );
+	if ( is_array( $downloads ) ) {
+		foreach ( $downloads as $download ) {
+			$download->set_access_expires( null );
 			$download->save();
 		}
 	}
 
-	// 3 & 4) Yay! Send an updated invoice to the customer with this message:
-	$order->add_order_note( __( "We've reset your download permissions. Please try downloading again.", 'woocommerce' ), true, true );
-});
+	// All restored. Store note and resend an updated invoice to the customer.
+	$order->add_order_note(
+		__( "We've reset your download permissions. Please try downloading again.", 'woo-regenerate-and-notify' ),
+		true,
+		true
+	);
+}
+
+// Register the function above.
+add_action( 'woocommerce_order_action_woo_regenerate_and_notify', 'woo_regenerate_and_notify' );

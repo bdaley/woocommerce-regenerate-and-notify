@@ -9,5 +9,11 @@
             "email": "brian.daley@uconn.edu"
         }
     ],
-    "require": {}
+    "require": {
+        "yahnis-elsts/plugin-update-checker": "^4.4"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.2",
+        "wp-coding-standards/wpcs": "^0.14.0"
+    }
 }
