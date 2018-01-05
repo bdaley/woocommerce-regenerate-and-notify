@@ -47,7 +47,7 @@ add_filter( 'woocommerce_order_actions', 'woo_regenerate_and_notify_custom_order
 
 
 /**
- * Executes regenerattion, expiry reset, order note, and notification to user.
+ * Executes regeneration, expiry reset, order note, and notification to user.
  *
  * @param  object $order The order WC_Order object.
  * @return void
