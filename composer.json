@@ -1,0 +1,13 @@
+{
+    "name": "brian/woocommerce-regenerate-and-notify",
+    "description": "A WooCommerce extension that regenerates download permissions (including expiration date) and notifies the customer.",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Brian Daley",
+            "email": "brian.daley@uconn.edu"
+        }
+    ],
+    "require": {}
+}
