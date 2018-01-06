@@ -25,6 +25,14 @@ if ( ! defined( 'WPINC' ) ) {
 // Composer dependencies.
 require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 
+
+// This plugin is hosted on GitHub, so we use a custom ppdate checker.
+$wran_update_checker = Puc_v4_Factory::buildUpdateChecker(
+	'https://github.com/bdaley/woocommerce-regenerate-and-notify/',
+	__FILE__,
+	'woocommerce-regenerate-and-notify'
+);
+
 /**
  * Adds the new action to the order action meta box.
  *
