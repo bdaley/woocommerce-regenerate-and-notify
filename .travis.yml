@@ -28,6 +28,19 @@ matrix:
     env: WP_TRAVISCI=phpcs
   - php: 5.3
     env: WP_VERSION=latest
+  - stage: GitHub Release
+    script: composer archive --format=zip --dir=build
+    deploy:
+      provider: releases
+      api_key:
+        secure: AziyvgNVMAPtSh+sb/Iu5848V1JcsiJ1O9aDT0agtj4UfSpAGZdPMt5cxuLilN6WaLn5j6DN9JpFqYJkNYdY+dJXr0ywh0UrC96allUGyzoa/LuD7gVl/VUQLw5HKY781M2fGtfS5+XOPfNXCiCA6HofQI7rFdzhP8Hq03zLQga6WFnYTGDlTeeOVjNr61ZTZj/eM/Av3Mu8715W/0td+3boO3gWcG5f4INcsCuiBI5UsvbUp7EfJsEwo/f+Lnb57e6QDV/a9KtfhJWYPuHcZXuRHkUjNtdU5+x62QQgA3XgSfiwVCdZnJDSKSPLabYRH6NMQKl/RcXQpQpnJyMXLd3W0ALipOWJ8xdXC+axwWyM+g19AysKPPPqe6x/Z4ipJJBSuTRFwq6TdAp8i4WXO+ANnZ9hEIf+8wssFZDjfyUYYKoV+nBwwLXrdOyPgHAEw3kq3ELSk4RKdhukImybyyNZLqh6bP3qiyBVh2JtbX2wBddktWId+84lDqCCQc19MoSWTzAhzT0xXKqYxXu6h6TtHAfGsiR8dDdFE9/wlNVibZ7WIhglhIbja18e14sviLhaBCtxQjT/APdoSdb48b0o9olXxmBViPjJI4+BwhAXVBv+5UyywyRoFrH9tUYpAAv6mWyqssMNz4woyH+uPqu8pxuBaCUHVxmZPezQVcQ=
+      file_glob: true
+      file: build/*.zip
+      skip_cleanup: true
+      on:
+        repo: bdaley/woocommerce-regenerate-and-notify
+        branch: master
+        tags: true
 before_script:
 - export PATH="$HOME/.composer/vendor/bin:$PATH"
 - |
@@ -61,15 +74,3 @@ script:
   if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
     phpcs
   fi
-before_deploy:
-  composer archive --format=zip --dir=build
-deploy:
-  provider: releases
-  api_key:
-    secure: AziyvgNVMAPtSh+sb/Iu5848V1JcsiJ1O9aDT0agtj4UfSpAGZdPMt5cxuLilN6WaLn5j6DN9JpFqYJkNYdY+dJXr0ywh0UrC96allUGyzoa/LuD7gVl/VUQLw5HKY781M2fGtfS5+XOPfNXCiCA6HofQI7rFdzhP8Hq03zLQga6WFnYTGDlTeeOVjNr61ZTZj/eM/Av3Mu8715W/0td+3boO3gWcG5f4INcsCuiBI5UsvbUp7EfJsEwo/f+Lnb57e6QDV/a9KtfhJWYPuHcZXuRHkUjNtdU5+x62QQgA3XgSfiwVCdZnJDSKSPLabYRH6NMQKl/RcXQpQpnJyMXLd3W0ALipOWJ8xdXC+axwWyM+g19AysKPPPqe6x/Z4ipJJBSuTRFwq6TdAp8i4WXO+ANnZ9hEIf+8wssFZDjfyUYYKoV+nBwwLXrdOyPgHAEw3kq3ELSk4RKdhukImybyyNZLqh6bP3qiyBVh2JtbX2wBddktWId+84lDqCCQc19MoSWTzAhzT0xXKqYxXu6h6TtHAfGsiR8dDdFE9/wlNVibZ7WIhglhIbja18e14sviLhaBCtxQjT/APdoSdb48b0o9olXxmBViPjJI4+BwhAXVBv+5UyywyRoFrH9tUYpAAv6mWyqssMNz4woyH+uPqu8pxuBaCUHVxmZPezQVcQ=
-  file_glob: true
-  file: build/*.zip
-  skip_cleanup: true
-  on:
-    repo: bdaley/woocommerce-regenerate-and-notify
-    branch: develop
