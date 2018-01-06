@@ -16,20 +16,8 @@ matrix:
   include:
   - php: 7.1
     env: WP_VERSION=latest
-  - php: 7.0
-    env: WP_VERSION=latest
-  - php: 5.6
-    env: WP_VERSION=4.6
-  - php: 5.6
-    env: WP_VERSION=latest
-  - php: 5.6
-    env: WP_VERSION=trunk
-  - php: 5.6
-    env: WP_TRAVISCI=phpcs
-  - php: 5.3
-    env: WP_VERSION=latest
   - stage: GitHub Release
-    script: composer archive --format=zip --dir=build
+    script: composer archive --format=zip --dir=build --file=woocommerce-regenerate-and-notify.zip
     deploy:
       provider: releases
       api_key:
